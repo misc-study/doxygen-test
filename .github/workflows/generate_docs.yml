@@ -42,6 +42,7 @@ jobs:
             git push -f origin $branch_name
           fi
           echo ::set-output name=commit_user::$last_commit_user_name
+          echo ::set-output name=branch_name::$branch_name
 
     - name: Install hub
       run: |
@@ -55,5 +56,7 @@ jobs:
         curl \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
-          "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls?state=open&sort=updated&direction=desc"
-        hub pull-request -m "Update docs" -b $DEFAULT_BRANCH
+          "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls?state=open&sort=updated&direction=desc" | jq '.[].head.ref' | grep ${{ steps.commit_push.outputs.branch_name }} 
+        if [ $? -ne 0 ]; then
+          hub pull-request -m "Update docs" -b $DEFAULT_BRANCH
+        fi
