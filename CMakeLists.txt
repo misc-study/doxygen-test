@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 2.8)
+project(test_cmake CXX)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/)
+file(GLOB project_files src/main.cc src/greet.cc)
+add_library(project OBJECT ${project_files})
+link_directories(/usr/local/lib)
+set(CMAKE_CXX_FLAGS "-std=c++14 -stdlib=libc++")
+add_executable(hello $<TARGET_OBJECTS:project>)
