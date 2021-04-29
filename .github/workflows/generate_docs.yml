@@ -1,16 +1,18 @@
-name: Documentation
+name: Doxygen Generator
+
+env:
+  DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
 
 on:
-  pull_request:
+  push:
     paths:
     - 'include/*.h'
+    branches:
+    - $DEFAULT_BRANCH
 
 jobs:
   generate-documentation:
     runs-on: ubuntu-latest
-
-    env:
-      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
 
     steps:
     - uses: actions/checkout@v2
@@ -20,35 +22,34 @@ jobs:
     - name: Generate doxygen
       uses: mattnotmitt/doxygen-action@v1.1.0
       with:
-          doxyfile-path: doxygen/Doxyfile
-          working-directory: .
+        doxyfile-path: doxygen/Doxyfile
+        working-directory: .
 
     - name: commit & push
       id: commit_push
       run: |
-          last_commit_user_name=`git log -1 --pretty=format:"%an"`
-          last_commit_user_email=`git log -1 --pretty=format:"%ae"`
-          OUTPUT_DIR="docs"
-          git fetch origin $DEFAULT_BRANCH
-          git switch $DEFAULT_BRANCH
-          branch_name=${{github.head_ref}}-update-docs
-          git switch -c "$branch_name"
-          git add -N "$OUTPUT_DIR"
-          if ! git diff --exit-code --quiet
-          then
-            git config user.name "$last_commit_user_name"
-            git config user.email "$last_commit_user_email"
-            git add "$OUTPUT_DIR"
-            git commit -m "Update docs"
-            git push -f origin $branch_name
-          fi
-          echo ::set-output name=commit_user::$last_commit_user_name
-          echo ::set-output name=branch_name::$branch_name
+        last_commit_user_name=`git log -1 --pretty=format:"%an"`
+        last_commit_user_email=`git log -1 --pretty=format:"%ae"`
+        OUTPUT_DIR="docs"
+        git fetch origin $DEFAULT_BRANCH
+        git switch $DEFAULT_BRANCH
+        branch_name=${{github.head_ref}}-update-docs
+        git switch -c "$branch_name"
+        git add -N "$OUTPUT_DIR"
+        if ! git diff --exit-code --quiet
+        then
+          git config user.name "$last_commit_user_name"
+          git config user.email "$last_commit_user_email"
+          git add "$OUTPUT_DIR"
+          git commit -m "Update docs"
+          git push -f origin $branch_name
+        fi
+        echo ::set-output name=commit_user::$last_commit_user_name
+        echo ::set-output name=branch_name::$branch_name
 
     - name: Install hub
       run: |
         sudo apt install hub
-
     - name: Create pull request
       env:
         GITHUB_USER: ${{ steps.commit_push.outputs.commit_user }}
@@ -58,7 +59,8 @@ jobs:
         curl \
           -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: token ${GITHUB_TOKEN}" \
-          "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls?state=open&sort=updated&direction=desc" | jq '.[].head.ref' | grep ${{ steps.commit_push.outputs.branch_name }} 
+          "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls?state=open&sort=updated&direction=desc" \
+          | jq '.[].head.ref' | grep ${{ steps.commit_push.outputs.branch_name }}
         ret="$?"
         set -e
         if [ $ret -ne 0 ]; then
