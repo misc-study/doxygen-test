@@ -6,7 +6,9 @@ on:
     - 'include/*.h'
 
 jobs:
-  build-documentation:
+  generate-documentation:
+    env:
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
     runs-on: ubuntu-latest
 
     steps:
@@ -26,8 +28,8 @@ jobs:
           last_commit_user_name=`git log -1 --pretty=format:"%an"`
           last_commit_user_email=`git log -1 --pretty=format:"%ae"`
           OUTPUT_DIR="docs"
-          git fetch origin main
-          git switch main
+          git fetch origin $DEFAULT_BRANCH
+          git switch $DEFAULT_BRANCH
           branch_name="feature/update-docs-`date "+%Y-%m%d-%H%M-%S"`"
           git switch -c "$branch_name"
           git add -N "$OUTPUT_DIR"
@@ -52,4 +54,4 @@ jobs:
         GITHUB_USER: ${{ steps.commit_push.outputs.commit_user }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        hub pull-request -m "Update docs" -b ${{ github.event.repository.default_branch }}
+        hub pull-request -m "Update docs" -b $DEFAULT_BRANCH
