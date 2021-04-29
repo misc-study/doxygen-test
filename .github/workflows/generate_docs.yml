@@ -11,9 +11,31 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
+      with:
+        ref: ${{github.head_ref}}
+
     - name: Doxygen Action
       uses: mattnotmitt/doxygen-action@v1.1.0
       with:
-          doxyfile-path: ./doxygen/Doxyfile
+          doxyfile-path: doxygen/Doxyfile
           working-directory: .
+
+    - name: commit & push
+      run: |
+          last_commit_user_name=`git log -1 --pretty=format:"%an"`
+          last_commit_user_email=`git log -1 --pretty=format:"%ae"`
+          echo "$last_commit_user_email"
+          OUTPUT_DIR="docs"
+          branch_name="feature/update-docs-`date "+%Y-%m%d-%H%M-%S"`"
+          git switch -c $branch_name
+          git add -N "$OUTPUT_DIR"
+          if ! git diff --exit-code --quiet
+          then
+            # git config user.name xxx
+            # git config user.email xxx
+            git config user.name "$last_commit_user_email"
+            git config user.email "$last_commit_user_name"
+            git add "$OUTPUT_DIR"
+            git commit -m "Update docs"
+            git push origin $branch_name
+          fi
