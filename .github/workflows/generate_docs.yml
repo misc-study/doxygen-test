@@ -53,6 +53,7 @@ jobs:
       env:
         GITHUB_USER: ${{ steps.commit_push.outputs.commit_user }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PULL_REQUEST_MD: pr.md
       run: |
         set +e
         curl \
@@ -63,7 +64,7 @@ jobs:
         ret="$?"
         set -e
         if [ $ret -ne 0 ]; then
-        cat <<EOF > pr.md
+        cat <<EOF > $PULL_REQUEST_MD
         Update docs
 
         ### About
@@ -72,6 +73,6 @@ jobs:
         ### Mention
         @$GITHUB_USER
         EOF
-        hub pull-request -F pr.md -b $DEFAULT_BRANCH -a $GITHUB_USER
-        rm -f pr.md
+        hub pull-request -F $PULL_REQUEST_MD -b $DEFAULT_BRANCH -a $GITHUB_USER
+        rm -f $PULL_REQUEST_MD
         fi
