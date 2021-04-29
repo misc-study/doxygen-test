@@ -63,5 +63,15 @@ jobs:
         ret="$?"
         set -e
         if [ $ret -ne 0 ]; then
-          hub pull-request -m "Update docs" -b $DEFAULT_BRANCH
+          cat <<EOF > pr.md
+          Update docs
+
+          ### About
+          This PR is automatically generated because `include/*.h` is modified.
+
+          ### Author
+          @$GITHUB_USER
+          EOF
+          hub pull-request -F pr.md -b $DEFAULT_BRANCH
+          rm -f pr.md
         fi
