@@ -9,6 +9,7 @@ on:
     - 'include/*.h'
     branches:
     - $DEFAULT_BRANCH
+    - main
 
 jobs:
   generate-documentation:
