@@ -69,9 +69,9 @@ jobs:
         ### About
         This PR is automatically generated because `include/*.h` is modified.
 
-        ### Author
+        ### Mention
         @$GITHUB_USER
         EOF
-        hub pull-request -F pr.md -b $DEFAULT_BRANCH
+        hub pull-request -F pr.md -b $DEFAULT_BRANCH -a $GITHUB_USER
         rm -f pr.md
         fi
