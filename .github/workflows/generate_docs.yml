@@ -67,7 +67,7 @@ jobs:
         Update docs
 
         ### About
-        This PR is automatically generated because `include/*.h` is modified.
+        This PR is automatically generated because \`include/*.h\` is modified.
 
         ### Mention
         @$GITHUB_USER
