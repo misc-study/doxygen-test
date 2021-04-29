@@ -1,15 +1,15 @@
 name: Doxygen Generator
 
 env:
-  DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+  DEFAULT_BRANCH: main
+  INCLUDE_DIRNAME: include
 
 on:
   push:
     paths:
-    - 'include/*.h'
+    - $INCLUDE_DIRNAME/*.h
     branches:
     - $DEFAULT_BRANCH
-    - main
 
 jobs:
   generate-documentation:
@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        ref: ${{github.head_ref}}
+        ref: $DEFAULT_BRANCH
 
     - name: Generate doxygen
       uses: mattnotmitt/doxygen-action@v1.1.0
@@ -28,13 +28,13 @@ jobs:
 
     - name: commit & push
       id: commit_push
+      env:
+        OUTPUT_DIR: docs
       run: |
-        last_commit_user_name=`git log -1 --pretty=format:"%an"`
-        last_commit_user_email=`git log -1 --pretty=format:"%ae"`
-        OUTPUT_DIR="docs"
-        git fetch origin $DEFAULT_BRANCH
-        git switch $DEFAULT_BRANCH
-        branch_name=${{github.head_ref}}-update-docs
+        last_commit_user_name=`git log -1 --pretty=format:"%an" $INCLUDE_DIRNAME`
+        last_commit_user_email=`git log -1 --pretty=format:"%ae" $INCLUDE_DIRNAME`
+        last_commit_short_id=`git log -1 --pretty=format:"%h" $INCLUDE_DIRNAME`
+        branch_name=feature/update-docs-${last_commit_short_id}
         git switch -c "$branch_name"
         git add -N "$OUTPUT_DIR"
         if ! git diff --exit-code --quiet
