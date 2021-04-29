@@ -1,6 +1,6 @@
 #include "greet.h"
 
 int main() {
-  hello("hoge");
+  hello("fuga");
   return 0;
 }
