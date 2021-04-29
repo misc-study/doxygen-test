@@ -26,7 +26,8 @@ jobs:
           last_commit_user_name=`git log -1 --pretty=format:"%an"`
           last_commit_user_email=`git log -1 --pretty=format:"%ae"`
           OUTPUT_DIR="docs"
-          git switch ${{ github.event.repository.default_branch }}
+          git fetch origin main
+          git switch main
           branch_name="feature/update-docs-`date "+%Y-%m%d-%H%M-%S"`"
           git switch -c "$branch_name"
           git add -N "$OUTPUT_DIR"
