@@ -3,7 +3,7 @@ name: Documentation
 on:
   pull_request:
     paths:
-    - './include/*.h'
+    - 'include/*.h'
 
 jobs:
   build-documentation:
