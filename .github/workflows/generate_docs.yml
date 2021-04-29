@@ -1,18 +1,16 @@
 name: Documentation
 
-env:
-  DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-
 on:
   pull_request:
     paths:
     - 'include/*.h'
-    branches:
-      - $DEFAULT_BRANCH
 
 jobs:
   generate-documentation:
     runs-on: ubuntu-latest
+
+    env:
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
 
     steps:
     - uses: actions/checkout@v2
