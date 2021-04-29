@@ -4,7 +4,7 @@
 /// @brief 挨拶クラス
 class Greet {
  public:
-   /// @brief helloo
+   /// @brief hello
    /// @param (text) 挨拶内容
    /// @return なし
    void hello(std::string text);
