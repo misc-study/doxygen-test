@@ -1,19 +1,18 @@
 name: Doxygen Generator
 
-env:
-  DEFAULT_BRANCH: main
-  INCLUDE_DIRNAME: include
-
 on:
   push:
     paths:
-    - $INCLUDE_DIRNAME/*.h
+    - include/*.h
     branches:
-    - $DEFAULT_BRANCH
+    - main
 
 jobs:
   generate-documentation:
     runs-on: ubuntu-latest
+
+    env:
+      DEFAULT_BRANCH: main
 
     steps:
     - uses: actions/checkout@v2
@@ -30,10 +29,11 @@ jobs:
       id: commit_push
       env:
         OUTPUT_DIR: docs
+        INCLUDE_DIR: include
       run: |
-        last_commit_user_name=`git log -1 --pretty=format:"%an" $INCLUDE_DIRNAME`
-        last_commit_user_email=`git log -1 --pretty=format:"%ae" $INCLUDE_DIRNAME`
-        last_commit_short_id=`git log -1 --pretty=format:"%h" $INCLUDE_DIRNAME`
+        last_commit_user_name=`git log -1 --pretty=format:"%an" $INCLUDE_DIR`
+        last_commit_user_email=`git log -1 --pretty=format:"%ae" $INCLUDE_DIR`
+        last_commit_short_id=`git log -1 --pretty=format:"%h" $INCLUDE_DIR`
         branch_name=feature/update-docs-${last_commit_short_id}
         git switch -c "$branch_name"
         git add -N "$OUTPUT_DIR"
